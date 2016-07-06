@@ -1,0 +1,18 @@
+{# src/OC/CoreBundle/Ressources/views/Contact/contact.html.twig #}
+
+{% extends "OCCoreBundle::layout.html.twig" %}
+
+{% block title %}
+    Contact - {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <h1>Contact</h1>
+
+    <p>
+        <a href="{{ path('oc_core_homepage') }}" class="btn btn-default">
+            <i class="glyphicon glyphicon-chevron-left"></i>
+            Retour à l'acceuil
+        </a>
+    </p>
+{% endblock %}
