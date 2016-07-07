@@ -4,8 +4,9 @@ namespace OC\PlatformBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-// N'oubliez pas ce use :
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Table(name="oc_advert")
@@ -23,21 +24,25 @@ class Advert
 
     /**
      * @ORM\Column(name="date", type="datetime")
+     * @Assert\DateTime()
      */
     private $date;
 
     /**
      * @ORM\Column(name="title", type="string", length=255)
+     * @Assert\Length(min=10)
      */
     private $title;
 
     /**
      * @ORM\Column(name="author", type="string", length=255)
+     * @Assert\Length(min=2)
      */
     private $author;
 
     /**
      * @ORM\Column(name="content", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $content;
 
@@ -48,6 +53,7 @@ class Advert
 
     /**
      * @ORM\OneToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist"})
+     * @Assert\Valid()
      */
     private $image;
 
@@ -73,6 +79,7 @@ class Advert
     private $nbApplications = 0;
 
     /**
+     * @Gedmo\Slug(fields={"title"})
      * @ORM\Column(name="slug", type="string", length=255, unique=true)
      */
     private $slug;
@@ -297,5 +304,21 @@ class Advert
     public function getSlug()
     {
         return $this->slug;
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function isContentValid(ExecutionContextInterface $context)
+    {
+        $forbiddenWords = array('démotivation', 'abandon');
+
+        if (preg_match('#'.implode('|', $forbiddenWords).'#', $this->getContent())) {
+            $context
+                ->buildViolation('Contenu invalide car il contient un mot interdit.')
+                ->atPath('content')
+                ->addViolation()
+            ;
+        }
     }
 }
